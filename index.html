@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#080b10">
+<title>DB Browser 0.2</title>
+<style>
+:root{color-scheme:dark;--bg:#080b10;--panel:#111722;--line:#263342;--green:#6dff9b;--muted:#93a0b1}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#12251e 0,#080b10 58%);color:#f3f6fa;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100dvh}
+.app{max-width:780px;margin:auto;padding:calc(env(safe-area-inset-top) + 15px) 14px calc(env(safe-area-inset-bottom) + 18px)}
+header{display:flex;align-items:center;gap:11px;margin:4px 0 18px}.logo{width:46px;height:46px;border-radius:14px;background:linear-gradient(145deg,#9affb8,#19a960);color:#06120a;display:grid;place-items:center;font-weight:950;font-size:17px;box-shadow:0 0 24px #54ff9433}.brand{font-size:21px;font-weight:850}.sub{font-size:10px;color:var(--muted);margin-top:3px;letter-spacing:1.7px}.pill{margin-left:auto;border:1px solid #24563a;color:var(--green);font-size:10px;padding:6px 9px;border-radius:99px}
+.searchbox{display:flex;gap:7px;background:#121923;border:1px solid #2b3948;border-radius:16px;padding:7px}.searchbox input{min-width:0;flex:1;background:transparent;border:0;outline:0;color:white;padding:10px 7px;font-size:15px}.btn{border:1px solid var(--line);background:#151d28;color:#e7edf5;border-radius:11px;padding:10px 11px;font-size:13px}.go{border:0;background:var(--green);color:#06120a;font-weight:850;border-radius:11px;padding:0 16px}
+.toolbar{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin:10px 0 14px}.toolbar .btn{padding:10px 3px;font-size:12px}
+.tabs{display:flex;gap:7px;overflow:auto;padding:2px 0 10px}.tab{flex:0 0 auto;max-width:160px;background:#101620;border:1px solid var(--line);color:#dce5ee;border-radius:10px;padding:9px 11px;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tab.active{border-color:var(--green);color:var(--green);background:#102018}.tab.add{color:var(--green);font-size:17px;padding:5px 14px}
+.sectionhead{display:flex;justify-content:space-between;align-items:center;margin:21px 2px 11px}h2{font-size:13px;letter-spacing:1.2px;text-transform:uppercase;margin:0;color:#dce5ee}.muted{color:var(--muted);font-size:11px}
+.shortcuts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.shortcut{min-width:0;border:1px solid var(--line);background:linear-gradient(145deg,#151d28,#0f141c);border-radius:15px;padding:13px 4px;text-align:center;color:#f5f7fa}.ico{margin:0 auto 8px;width:37px;height:37px;border-radius:12px;display:grid;place-items:center;background:#1a2c25;color:var(--green);font-size:17px;font-weight:800}.shortcut span{font-size:11px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.panel{background:#101620;border:1px solid var(--line);border-radius:15px;padding:14px;margin-top:10px}.panel p{font-size:12px;line-height:1.5;color:var(--muted);margin:7px 0 0}
+#browser{display:none;margin-top:8px}.framebar{display:flex;align-items:center;gap:7px;margin:9px 0}.framebar button{background:#151d28;color:#dfe8f1;border:1px solid var(--line);border-radius:10px;padding:9px 10px}.framebar #current{font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+iframe{width:100%;height:58dvh;border:1px solid var(--line);border-radius:13px;background:white}.notice{font-size:11px;color:#a8b5c4;line-height:1.5;margin:9px 2px}
+#drawer{display:none;margin-top:14px}.item{display:flex;align-items:center;gap:8px;padding:11px 2px;border-bottom:1px solid #202b38}.item .itemtitle{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}.item button{padding:7px 9px}
+footer{text-align:center;color:#596879;font-size:10px;margin:23px 0 6px;letter-spacing:.8px}
+@media(min-width:600px){.app{padding-top:25px}.shortcuts{grid-template-columns:repeat(4,1fr)}}
+</style>
+</head>
+<body><main class="app">
+<header><div class="logo">DB</div><div><div class="brand">DB Browser</div><div class="sub">FAST · DARK · SIMPLE</div></div><div class="pill">BETA 0.2</div></header>
+<form class="searchbox" id="searchForm"><input id="address" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Tìm kiếm hoặc nhập địa chỉ…" aria-label="Tìm kiếm hoặc nhập địa chỉ"><button class="go" type="submit">ĐI ↗</button></form>
+<div class="toolbar">
+<button class="btn" id="back">← Trước</button><button class="btn" id="forward">Sau →</button><button class="btn" id="reload">↻ Tải lại</button><button class="btn" id="bookmark">☆ Lưu</button><button class="btn" id="home">⌂ Home</button>
+</div>
+<div class="tabs" id="tabs"></div>
+<section id="homePage">
+<div class="sectionhead"><h2>Truy cập nhanh</h2><span class="muted">Chạm để mở</span></div>
+<div class="shortcuts">
+<button class="shortcut" data-url="https://www.google.com"><div class="ico">G</div><span>Google</span></button>
+<button class="shortcut" data-url="https://www.youtube.com"><div class="ico">▶</div><span>YouTube</span></button>
+<button class="shortcut" data-url="https://vi.wikipedia.org"><div class="ico">W</div><span>Wikipedia</span></button>
+<button class="shortcut" data-url="https://www.bing.com"><div class="ico">B</div><span>Bing</span></button>
+</div>
+<div class="sectionhead"><h2>Thư viện</h2><span class="muted">Lưu trên thiết bị</span></div>
+<div class="toolbar" style="grid-template-columns:1fr 1fr"><button class="btn" id="showBookmarks">☆ Dấu trang</button><button class="btn" id="showHistory">◷ Lịch sử</button></div>
+<div class="panel"><strong>DB Browser 0.2</strong><p>Bản thử nghiệm có tab, dấu trang và lịch sử lưu cục bộ. Một số website chặn khung nhúng; dùng nút “Mở ngoài” để thử mở trong Safari.</p></div>
+</section>
+<section id="browser"><div class="framebar"><button id="browserHome">⌂</button><div id="current">Trang web</div><button id="openExternal">Mở ngoài ↗</button></div><iframe id="view" title="Nội dung trang web" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-forms allow-scripts allow-same-origin allow-popups allow-downloads"></iframe><p class="notice">Nếu trang trắng hoặc báo không thể hiển thị, website có thể chặn khung nhúng. Nhấn “Mở ngoài” để thử mở bằng Safari.</p></section>
+<section id="drawer"><div class="sectionhead"><h2 id="drawerTitle">Dấu trang</h2><button class="btn" id="closeDrawer">Đóng ×</button></div><div id="drawerItems"></div></section>
+<footer>DB BROWSER · PROTOTYPE 0.2 · NOT AN APP STORE RELEASE</footer>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const form=$('searchForm'), input=$('address'), homePage=$('homePage'), browser=$('browser'), view=$('view');
+let tabs=[], activeId=1, nextId=2, bookmarks=JSON.parse(localStorage.getItem('db_bookmarks')||'[]'), visits=JSON.parse(localStorage.getItem('db_history')||'[]');
+function active(){return tabs.find(t=>t.id===activeId)}
+function norm(v){let q=v.trim();if(!q)return '';if(/^https?:\/\//i.test(q))return q;if(/^(localhost|[\w-]+\.)+[\w-]{2,}([/:?#].*)?$/i.test(q)&&!q.includes(' '))return 'https://'+q;return 'https://www.google.com/search?q='+encodeURIComponent(q)}
+function titleOf(url){try{return new URL(url).hostname.replace(/^www\./,'')}catch{return url}}
+function persist(){localStorage.setItem('db_bookmarks',JSON.stringify(bookmarks));localStorage.setItem('db_history',JSON.stringify(visits.slice(0,100)))}
+function renderTabs(){$('tabs').innerHTML='';tabs.forEach(t=>{let b=document.createElement('button');b.className='tab'+(t.id===activeId?' active':'');b.textContent=(t.url?titleOf(t.url):'Trang mới')+'  ×';b.onclick=()=>{if(t.id===activeId&&tabs.length>1){tabs=tabs.filter(x=>x.id!==t.id);activeId=tabs[Math.max(0,tabs.length-1)].id;renderActive()}else{activeId=t.id;renderActive()}};$('tabs').appendChild(b)});let add=document.createElement('button');add.className='tab add';add.textContent='+';add.setAttribute('aria-label','Tab mới');add.onclick=newTab;$('tabs').appendChild(add)}
+function renderActive(){let t=active();if(!t)return;renderTabs();input.value=t.url||'';if(t.url){homePage.style.display='none';$('drawer').style.display='none';browser.style.display='block';$('current').textContent=t.url;view.src=t.url}else{view.src='about:blank';browser.style.display='none';homePage.style.display='block';$('drawer').style.display='none'}}
+function newTab(url=''){let t={id:nextId++,url,back:[],forward:[]};tabs.push(t);activeId=t.id;if(url)navigate(url,false);else renderActive()}
+function navigate(raw,addHistory=true){let url=norm(raw);if(!url)return;let t=active();if(!t){newTab(url);return}if(t.url&&addHistory)t.back.push(t.url);t.forward=[];t.url=url;renderActive();if(addHistory){visits.unshift({url,time:new Date().toLocaleString('vi-VN')});visits=visits.slice(0,100);persist()}}
+function goHome(){let t=active();if(t){t.url='';t.back=[];t.forward=[]}renderActive()}
+form.addEventListener('submit',e=>{e.preventDefault();navigate(input.value)});
+document.querySelectorAll('[data-url]').forEach(el=>el.addEventListener('click',()=>navigate(el.dataset.url)));
+$('back').onclick=()=>{let t=active();if(t&&t.back.length){t.forward.push(t.url);t.url=t.back.pop();renderActive()}};
+$('forward').onclick=()=>{let t=active();if(t&&t.forward.length){t.back.push(t.url);t.url=t.forward.pop();renderActive()}};
+$('reload').onclick=()=>{let t=active();if(t&&t.url)view.src=t.url};
+$('home').onclick=goHome;$('browserHome').onclick=goHome;
+$('openExternal').onclick=()=>{let t=active();if(t&&t.url)window.open(t.url,'_blank','noopener')};
+$('bookmark').onclick=()=>{let t=active();if(!t||!t.url){alert('Mở một website trước nhé bro.');return}if(!bookmarks.some(b=>b.url===t.url))bookmarks.unshift({url:t.url,title:titleOf(t.url)});persist();$('bookmark').textContent='★ Đã lưu';setTimeout(()=>$('bookmark').textContent='☆ Lưu',1200)};
+function showList(kind){browser.style.display='none';homePage.style.display='none';$('drawer').style.display='block';$('drawerTitle').textContent=kind==='bookmarks'?'Dấu trang':'Lịch sử';let items=kind==='bookmarks'?bookmarks:visits;$('drawerItems').innerHTML='';if(!items.length){$('drawerItems').textContent='Chưa có mục nào.';return}items.forEach((it,i)=>{let row=document.createElement('div');row.className='item';let title=document.createElement('div');title.className='itemtitle';title.textContent=(it.title||titleOf(it.url))+(it.time?' · '+it.time:'');let open=document.createElement('button');open.className='btn';open.textContent='Mở';open.onclick=()=>navigate(it.url);row.append(title,open);if(kind==='bookmarks'){let del=document.createElement('button');del.className='btn';del.textContent='×';del.onclick=()=>{bookmarks.splice(i,1);persist();showList(kind)};row.appendChild(del)}$('drawerItems').appendChild(row)})}
+$('showBookmarks').onclick=()=>showList('bookmarks');$('showHistory').onclick=()=>showList('history');$('closeDrawer').onclick=()=>{if(active()?.url)renderActive();else{ $('drawer').style.display='none';homePage.style.display='block'}};
+tabs=[{id:1,url:'',back:[],forward:[]}];renderActive();
+</script></body></html>
